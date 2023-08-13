@@ -5,9 +5,13 @@ import matplotlib.pyplot as plt
 from cities import cities
 from typing import List
 
+"""
+TODO - not really working too well, I think it is my tournament selection so I want to change this or maybe add in some form of elitism
+"""
+
 MAX_CITIES = 30
 POP_SIZE = 6
-LIMIT = 120000
+LIMIT = 30000
 
 def main():
 
@@ -24,13 +28,6 @@ def main():
             min_pos = i
 
     print(f"BEST RANDOM PERMUTATION TOUR: {min_fitness}({min_pos})")
-
-    random_best_order = []
-    for i in range(0, MAX_CITIES):
-        random_best_order.append(cities[original_permutations[min_pos][i]])
-
-    # adding final pos (back to start)
-    random_best_order.append(cities[original_permutations[min_pos][0]])
 
     # running ea
     ea_best_order = evolve(original_permutations)
@@ -94,6 +91,19 @@ def tournament(perms):
     """This will return the new population ready for crossover and mutation"""
     new_pop_size = POP_SIZE / 2  # this has changed until crossover is fixed
     new_pop = []
+    
+    # elitism - promoting the best performing
+    min_pos = 0
+    min_fitness = tour_fitness(perms[0])
+    for i in range(1, len(perms)):
+        curr_fitness = tour_fitness(perms[i])
+        if curr_fitness < min_fitness:
+            min_fitness = curr_fitness
+            min_pos = i
+
+    new_pop.append(perms[min_pos])
+    perms.pop(min_pos)
+
     while len(new_pop) < new_pop_size:
         # getting random players for 2 player tournament
         indx1 = random.randint(0, len(perms) - 1)
