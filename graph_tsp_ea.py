@@ -40,9 +40,11 @@ def main():
     # adding final pos (back to start)
     best_order.append(cities[original_permutations[min_pos][0]])
 
-    plt.scatter(*zip(*best_order))
-    plt.plot(*zip(*best_order))
-    plt.show()
+    new_pop = tournament(original_permutations)
+
+    # plt.scatter(*zip(*best_order))
+    # plt.plot(*zip(*best_order))
+    # plt.show()
 
 def tour_fitness(tour: List[int]):
     path_length = 0
@@ -57,6 +59,39 @@ def sld(indx1, indx2):
     pos1 = cities[indx1]
     pos2 = cities[indx2]
     return math.sqrt(math.pow((pos1[0]-pos2[0]), 2) + math.pow((pos1[1]-pos2[1]), 2))
+
+def evolve():
+    """driver function for the evolutionary algorithm"""
+    pass
+
+def tournament(perms):
+    """This will return the new population ready for crossover and mutation"""
+    new_pop_size = POP_SIZE / 2
+    new_pop = []
+    while len(new_pop) < new_pop_size:
+        # getting random players for 2 player tournament
+        indx1 = random.randint(0, len(perms)-1)
+        indx2 = indx1
+        while indx1 == indx2:
+            indx2 = random.randint(0, len(perms)-1)
+
+        p1 = perms[indx1]
+        p2 = perms[indx2]
+
+        if tour_fitness(p1) > tour_fitness(p2):
+            new_pop.append(p1)
+            perms.pop(indx1)
+        else:
+            new_pop.append(p2)
+            perms.pop(indx2)
+
+    return new_pop
+
+def crossover(indx1, indx2):
+    pass
+
+def mutation(indx):
+    pass
 
 def generate_permutations():
     perms = [[0] for _ in range(POP_SIZE)]
