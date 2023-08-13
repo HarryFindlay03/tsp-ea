@@ -6,12 +6,16 @@ from cities import cities
 from typing import List
 
 """
-TODO - not really working too well, I think it is my tournament selection so I want to change this or maybe add in some form of elitism
+TODO
+- add in convergence checks
+- not really working too well, I think it is my tournament selection so I want to change this or maybe add in some form of elitism
+- I need to add in some adjustable rates like crossover rates and mutation rates as this may be where some of my problems lie because everything seems to be working okay
+- also cleaning up the code
 """
 
 MAX_CITIES = 30
-POP_SIZE = 6
-LIMIT = 30000
+POP_SIZE = 8
+LIMIT = 5
 
 def main():
 
@@ -27,7 +31,7 @@ def main():
             min_fitness = curr_fitness
             min_pos = i
 
-    print(f"BEST RANDOM PERMUTATION TOUR: {min_fitness}({min_pos})")
+    print(f"BEST STARTING TOUR LENGTH: {min_fitness}({min_pos})")
 
     # running ea
     ea_best_order = evolve(original_permutations)
@@ -189,7 +193,7 @@ def ordered_crossover(tour1, tour2):
                 child_pos = indx2 + 1
             child2[child_pos] = tour1[i]
             child_pos += 1
-
+    
     return (child1, child2)
 
 
