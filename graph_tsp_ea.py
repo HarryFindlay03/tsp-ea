@@ -6,7 +6,7 @@ from cities import cities
 from typing import List
 
 """
-TODO use ordered crossover because of course normal crossover is not going to work as it will induce duplicate cities....
+TODO add in the return leg I think this is why the EA is not working so well
 """
 
 MAX_X = 10000
@@ -98,7 +98,7 @@ def evolve(original_permutations, generations):
         # resetting population to next generation
         pop = next_gen
 
-    # finding the best solution and returning after 50 generations
+    # finding the best solution and returning after generations generations
     min_fitness = tour_fitness(pop[0])
     best_pos = 0
     for i in range(1, len(pop)):
@@ -124,7 +124,7 @@ def tournament(perms):
         p1 = perms[indx1]
         p2 = perms[indx2]
 
-        if tour_fitness(p1) > tour_fitness(p2):
+        if tour_fitness(p1) < tour_fitness(p2):
             new_pop.append(p1)
             perms.pop(indx1)
         else:
