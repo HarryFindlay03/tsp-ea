@@ -2,6 +2,7 @@ import random
 import math
 from threading import current_thread
 import matplotlib.pyplot as plt
+from numpy import cross
 
 from cities import cities
 from typing import List
@@ -87,8 +88,16 @@ def tournament(perms):
 
     return new_pop
 
-def crossover(indx1, indx2):
-    pass
+def crossover(tour1, tour2):
+    """
+    Takes 2 tours and performs a crossover operation on them at a random crossover point 
+    returns a tuple containing the new tours
+    """
+    crossover_point = random.randint(0, MAX_CITIES-1)
+    tour1_first, tour1_second = tour1[:crossover_point], tour1[crossover_point:]
+    tour2_first, tour2_second = tour2[:crossover_point], tour2[crossover_point:]
+    return(tour1_first + tour2_second, tour2_first + tour1_second)
+
 
 def mutation(indx):
     pass
