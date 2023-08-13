@@ -1,11 +1,13 @@
 import random
 import math
-from threading import current_thread
 import matplotlib.pyplot as plt
-from numpy import cross
 
 from cities import cities
 from typing import List
+
+"""
+TODO use ordered crossover because of course normal crossover is not going to work as it will induce duplicate cities....
+"""
 
 MAX_X = 10000
 MAX_Y = 10000
@@ -34,14 +36,17 @@ def main():
 
     print(f'BEST RANDOM PERMUTATION TOUR: {min_fitness}({min_pos})')
     
-    best_order = []
+    random_best_order = []
     for i in range(0, MAX_CITIES):
-        best_order.append(cities[original_permutations[min_pos][i]])
+        random_best_order.append(cities[original_permutations[min_pos][i]])
 
     # adding final pos (back to start)
-    best_order.append(cities[original_permutations[min_pos][0]])
+    random_best_order.append(cities[original_permutations[min_pos][0]])
 
-    new_pop = tournament(original_permutations)
+    # running ea
+    ea_best_order = evolve(original_permutations)
+    print(f'BEST EA TOUR LENGTH: {tour_fitness(ea_best_order)}')
+
 
     # plt.scatter(*zip(*best_order))
     # plt.plot(*zip(*best_order))
@@ -61,13 +66,46 @@ def sld(indx1, indx2):
     pos2 = cities[indx2]
     return math.sqrt(math.pow((pos1[0]-pos2[0]), 2) + math.pow((pos1[1]-pos2[1]), 2))
 
-def evolve():
-    """driver function for the evolutionary algorithm"""
-    pass
+def evolve(original_permutations):
+    """
+    driver function for the evolutionary algorithm
+    returns the best tour found after 50 generations
+    """
+    pop = original_permutations
+    for _ in range(50):
+        # tournament selection
+        pop = tournament(pop)
+
+        # crossover
+        next_gen = []
+        for j in range(0, len(pop)-1):
+            res1, res2 = crossover(pop[j], pop[j+1])
+            next_gen.append(res1)
+            next_gen.append(res2)
+
+
+        # mutation
+        for j in range(0, len(next_gen)):
+            next_gen[j] = mutation(next_gen[j])
+        
+        # resetting population to next generation
+        pop = next_gen
+
+    # finding the best solution and returning after 50 generations
+    min_fitness = tour_fitness(pop[0])
+    best_pos = 0
+    for i in range(1, len(pop)):
+        curr_fitness = tour_fitness(pop[i])
+        if curr_fitness < min_fitness:
+            min_fitness = curr_fitness
+            best_pos = i
+
+    return pop[best_pos]
+
 
 def tournament(perms):
     """This will return the new population ready for crossover and mutation"""
-    new_pop_size = POP_SIZE / 2
+    new_pop_size = POP_SIZE / 2 # this has changed until crossover is fixed
     new_pop = []
     while len(new_pop) < new_pop_size:
         # getting random players for 2 player tournament
@@ -99,8 +137,16 @@ def crossover(tour1, tour2):
     return(tour1_first + tour2_second, tour2_first + tour1_second)
 
 
-def mutation(indx):
-    pass
+def mutation(tour):
+    # generate two random positions for a swap mutation
+    indx1 = random.randint(0, len(tour)-1)
+    indx2 = indx1
+    while indx1 == indx2:
+        indx2 = random.randint(0, len(tour)-1)
+
+    tour[indx1], tour[indx2] = tour[indx2], tour[indx1]
+    return tour
+
 
 def generate_permutations():
     perms = [[0] for _ in range(POP_SIZE)]
